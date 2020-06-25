@@ -2,6 +2,10 @@ import face_recognition
 import cv2
 import numpy as np
 
+from keras.models import load_model
+
+model = load_model('keras_model.h5')
+
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
 #   1. Process each video frame at 1/4 resolution (though still display it at full resolution)
@@ -42,6 +46,8 @@ while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
 
+    h_frame =cv2.resize(frame,(224,224))
+    h_frame = h_frame.reshape(1,224,224,3)
     # Resize frame of video to 1/4 size for faster face recognition processing
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
@@ -54,6 +60,12 @@ while True:
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
+        predicted = model.predict_classes(h_frame)
+        
+
+
+        
+        
         face_names = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
@@ -91,6 +103,11 @@ while True:
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+
+        if(predicted==1):
+            image = cv2.putText(frame,"HeadPhones detected",(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2,cv2.LINE_AA)
+        else:
+            image = cv2.putText(frame,"no headphones detected",(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2,cv2.LINE_AA)
 
     # Display the resulting image
     cv2.imshow('Video', frame)
