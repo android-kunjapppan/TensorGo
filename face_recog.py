@@ -2,6 +2,9 @@ import face_recognition
 import cv2
 import numpy as np
 
+import cvlib as cv
+from cvlib.object_detection import draw_bbox
+
 from keras.models import load_model
 
 model = load_model('keras_model.h5')
@@ -62,7 +65,12 @@ while True:
 
         predicted = model.predict_classes(h_frame)
         
+        bbox, label, conf = cv.detect_common_objects(frame, confidence=0.25, model='yolov3-tiny')
 
+        print(bbox, label, conf)
+
+        # draw bounding box over detected objects
+        out = draw_bbox(frame, bbox, label, conf, write_conf=True)
 
         
         
@@ -105,12 +113,12 @@ while True:
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
         if(predicted==1):
-            image = cv2.putText(frame,"HeadPhones detected",(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2,cv2.LINE_AA)
+            image = cv2.putText(frame,"HeadPhones detected",(25,25),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2,cv2.LINE_AA)
         else:
-            image = cv2.putText(frame,"no headphones detected",(50,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2,cv2.LINE_AA)
+            image = cv2.putText(frame,"no headphones detected",(25,25),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2,cv2.LINE_AA)
 
     # Display the resulting image
-    cv2.imshow('Video', frame)
+    cv2.imshow('Video', out)
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
