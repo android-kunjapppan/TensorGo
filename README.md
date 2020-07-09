@@ -1,3 +1,3 @@
 # TensorGo
 
-Used yolo-tiny model for object detection.
+Used yolo-tiny model for object detection and face_recognition for face recognition tasks.
